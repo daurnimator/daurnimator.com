@@ -1,0 +1,20 @@
+---
+layout: post
+title: Getting FFmpeg on windows
+date: '2011-10-16T13:32:05+11:00'
+tags: []
+tumblr_url: http://daurnimator.com/post/11506463329/getting-ffmpeg-on-windows
+---
+<p>All the guides to getting ffmpeg working on windows seem to be extremely outdated; so here is a quick howto:</p>
+<ol><li>Download <a title="MinGW installer" href="http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110802/mingw-get-inst-20110802.exe/download?source=files">mingw</a></li>
+<li>Install mingw with MSYS option; it will download and setup in C:\MinGW</li>
+<li>Get the mingw coreutils extra package (can be found from <a href="http://sourceforge.net/projects/mingw/files/MSYS/BaseSystem/coreutils/">here</a>); <a title="Coreutils extra package" href="http://sourceforge.net/projects/mingw/files/MSYS/BaseSystem/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys-1.0.13-ext.tar.lzma/download">current version</a></li>
+<li>Install the coreutils extras package by un-7zipping and un-tarring it to C:\MinGW\msys\1.0\bin</li>
+<li>Download <a href="http://www.tortall.net/projects/yasm/releases/yasm-1.1.0-win32.exe">yasm</a>; save it as C:\MinGW\msys\1.0\bin\yasm.exe</li>
+<li>Download and extract <a title="FFmpeg source snapshot" href="http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=HEAD;sf=tgz">ffmpeg source</a> (I used revision 647ec6f)</li>
+<li>Edit your C:\MinGW\msys\1.0\etc\fstab file to add the location of your ffmpeg source</li>
+<li>Open MinGW shell (it should be in your start menu)</li>
+<li>change to the directory you extract ffmpeg (going via the alias you added in fstab)</li>
+<li>./configure</li>
+<li>make</li>
+</ol>

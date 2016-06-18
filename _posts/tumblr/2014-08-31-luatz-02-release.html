@@ -1,0 +1,26 @@
+---
+layout: post
+title: luatz 0.2 Release
+date: '2014-08-31T11:16:30+10:00'
+tags:
+- lua
+- luatz
+- datetime
+tumblr_url: http://daurnimator.com/post/96219263429/luatz-02-release
+---
+<p><span>I&rsquo;m happy to announce a new release of luatz: 0.2</span></p>
+<p><span>My lua library to work with dates and times.</span></p>
+<div>
+<div><strong>Features include:</strong><br/><ul><li><span>A <code>os.date</code> compatible class &ldquo;timetable&rdquo; supporting normalisation</span></li>
+<li>Conversion between locations (time zones) using your local <a href="https://www.iana.org/time-zones">zoneinfo </a>database.</li>
+<li><span>RFC-3339 parsing</span></li>
+<li><span>Works with 5.1, 5.2 and LuaJIT.</span></li>
+</ul></div>
+<div><strong>New in this release:</strong><br/><ul><li><span>Support for fractional timetable component normalisation</span></li>
+<ul><li><span>e.g. <code>.month=6.5</code>, <code>.day=1</code> (which could be read as &ldquo;the first day after the middle of June&rdquo;) normalises to <code>.month=2</code>, <code>.day=16</code></span></li>
+</ul><li><span>Top level aliases for common operations</span></li>
+<li><span>Own implementation of <code>stftime</code> formatting (locales are not yet complete)</span></li>
+<li>Uses <a href="http://www.myriabit.com/ljsyscall/">ljsyscall</a> for more accurate time when available</li>
+</ul><div>Currently hosted on github (along with documentation and examples): <a href="https://github.com/daurnimator/luatz" target="_blank">https://github.com/daurnimator/luatz</a><br/>Available via MoonRocks: <a href="https://rocks.moonscript.org/modules/daurnimator/luatz/0.2-1" target="_blank">https://rocks.moonscript.org/modules/daurnimator/luatz/0.2-1</a><br/>Source download: <a href="https://github.com/daurnimator/luatz/releases/tag/v0.2" target="_blank">https://github.com/daurnimator/luatz/releases/tag/v0.2</a></div>
+</div>
+</div>

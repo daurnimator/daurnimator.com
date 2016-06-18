@@ -1,0 +1,16 @@
+---
+layout: post
+title: Linux fork detection using thread specific keyrings
+date: '2015-06-01T14:33:47+10:00'
+tags:
+- linux
+- openssl
+- programming
+- prng
+tumblr_url: http://daurnimator.com/post/120415954844/linux-fork-detection-using-thread-specific
+---
+<a href="https://gist.github.com/daurnimator/dfdbaef3c255bdc11531">Linux fork detection using thread specific keyrings</a><br/><p>I was reading Linux&rsquo;s <a href="https://www.kernel.org/doc/Documentation/security/keys.txt">keys.txt</a> and realised that this provided a place to store process or even thread local data that didn&rsquo;t depend on libc.</p>
+
+<p>Detecting if the current process has been forked is important for PRNGs (Psuedo random number generators). Normally fork detection has been done by checking <code>getpid()</code> and/or the installation of an <code>pthread_atfork</code> handler, but this can be fooled due to pid wrapping (see <a href="https://www.agwa.name/blog/post/libressls_prng_is_unsafe_on_linux">here</a>).</p>
+
+<p>I wrote up <a href="https://gist.github.com/daurnimator/dfdbaef3c255bdc11531">this example</a> to show how you might accomplish pid detection on Linux utilising the kernel&rsquo;s thread specific keyring.</p>

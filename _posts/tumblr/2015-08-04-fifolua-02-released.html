@@ -1,0 +1,25 @@
+---
+layout: post
+title: Fifo.lua 0.2 Released
+date: '2015-08-04T23:09:41+10:00'
+tags:
+- lua
+- programming
+- fifo.lua
+tumblr_url: http://daurnimator.com/post/125841407829/fifolua-02-released
+---
+<a href="https://github.com/daurnimator/fifo.lua">Fifo.lua 0.2 Released</a><br/><p>Today I&rsquo;m releasing verion 0.2 of &ldquo;fifo.lua&rdquo;.
+A lua library that provides a fifo of lua objects.</p>
+
+<h2>Changes since 0.1</h2>
+
+<ul><li><code>:setempty</code> now returns the fifo so that initialisation is simplified</li>
+<li><code>:peek</code> returns 2nd value indicating if there was a value at the given index</li>
+<li>Remove undocumented <code>:iter</code> and <code>:foreach</code> methods</li>
+<li>Added <code>__len</code> metamethod as alias for <code>:length</code> method (only available in 5.2+)</li>
+<li>Fixed bug in <code>:remove</code> method where the last element could not be removed</li>
+<li>Stricter argument checking</li>
+<li>Move documentation out of README into a <a href="http://pandoc.org/">pandoc</a> compatible markdown file</li>
+<li>Dropped Lua 5.0 support</li>
+<li>Improved performance (especially in LuaJIT)</li>
+</ul>

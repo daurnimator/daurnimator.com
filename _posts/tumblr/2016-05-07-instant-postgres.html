@@ -1,0 +1,21 @@
+---
+layout: post
+title: Instant postgres
+date: '2016-05-07T21:10:27+10:00'
+tags:
+- postgres
+- postgresql
+- command line
+- sql
+tumblr_url: http://daurnimator.com/post/143986521649/instant-postgres
+---
+<p>Sometimes I need a temporary postgres to try something out.
+I keep this script around as <code>instantpg.sh</code>:</p>
+
+<pre><code>#!/bin/bash
+trap "rm -rf -- $PGDATA" EXIT
+export PGDATA="$(mktemp -d)" PGPORT=1234
+initdb
+echo "Connect with: psql -p \"$PGPORT\" -h localhost -d postgres"
+postgres -F -k ""
+</code></pre>

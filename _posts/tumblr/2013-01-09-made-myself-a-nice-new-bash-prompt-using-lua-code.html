@@ -1,0 +1,27 @@
+---
+layout: post
+title: made myself a nice new bash prompt using lua code
+date: '2013-01-09T02:32:00+11:00'
+tags:
+- lua
+- programming
+- bash
+tumblr_url: http://daurnimator.com/post/40015182915/made-myself-a-nice-new-bash-prompt-using-lua-code
+---
+<img src="/tumblr_files/tumblr_mgbcizXdqm1qztyaio1_1280.png"/><br/><p>Made myself a nice new bash prompt using lua. Code can be found in this <a href="https://gist.github.com/4484437" title="gist" target="_blank">gist</a>.</p>
+
+
+
+<p>I started off trying to set <code>PS1</code>, but bash will incorrectly calcuate the prompt length. This leaves you with strange line wrapping behaviour. Thanks to <a href="http://hoelz.ro/">Rob Hoelz</a> I found out about <code>PROMPT_COMMAND</code>, which allows you to run a command before PS1 is printed.</p>
+
+
+
+<p>I used ljsyscall to avoid as many new processes as possible, they could be replaced by commands if you want.</p>
+
+
+
+<p>To get the git and mercurial (hg) status, I had to call out to see if the current directory is inside a repository: this can sometimes be slow, as git and hg have to traverse the whole way up the directory tree <code>stat</code>-ing for <code>.git</code> and <code>.hg</code> folders.</p>
+
+
+
+<p><strong>EDIT: </strong>Using <code>PROMPT_COMMAND</code> caused issues when scrolling through history, or pressing backspace at the beginning of a line. From the <a href="irc://irc.freenode.net/bash">#bash IRC channel</a> I found out that you can inform bash of non-printing characters by wrapping the bytes in <code>\1</code> and <code>\2</code>. The gist has been updated.</p>

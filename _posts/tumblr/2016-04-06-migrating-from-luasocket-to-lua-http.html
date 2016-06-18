@@ -1,0 +1,103 @@
+---
+layout: post
+title: Migrating from luasocket to lua-http
+date: '2016-04-06T11:17:18+10:00'
+tags:
+- lua
+- programming
+- lua-http
+- http
+tumblr_url: http://daurnimator.com/post/142323715859/migrating-from-luasocket-to-lua-http
+---
+<p>I saw <a href="https://github.com/brunoos/luasec/issues/72#issuecomment-205328635">https://github.com/brunoos/luasec/issues/72#issuecomment-205328635</a> and couldn&rsquo;t resist writing <a href="https://gist.github.com/is73/d50fa12718812e0f0c76c991030b8583">the linked code</a> to use <a href="https://github.com/daurnimator/lua-http">lua-http</a> instead.</p>
+
+<p><!-- more --></p>
+
+<p>As the code was originally using luasocket&rsquo;s http interface, it was straightforward to convert it to lua-http&rsquo;s <a href="https://daurnimator.github.io/lua-http/#http.compat.socket">http.compat.socket</a> module. This compatability interface provides the same API as luasocket&rsquo;s <code>socket.http</code> and luasec&rsquo;s <code>ssl.https</code> modules.</p>
+
+<pre><code>
+local http = require "http.compat.socket" -- require "socket.http"
+local https = http -- require "ssl.https"
+local ltn12 = require "ltn12"
+local string_sub = string.sub
+local table_concat = table.concat
+local function make_request(url, timeout)
+    http.TIMEOUT = timeout
+    http.USERAGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36"
+    local b, c, h, s
+    local tbody = {}
+    local https_opt = {
+        url = url,
+        protocol = "tlsv1",
+        verify = "none",
+        headers = {
+            ["Accept"] = "*/*",
+            ["Accept-Language"] = "sk;q=0.8,en-US,en;q=0.6,cs;q=0.4",
+            ["Accept-Charset"] = "UTF-8;q=0.8,*;q=0.7",
+        },
+        sink = ltn12.sink.table(tbody),
+        redirect = false,
+    }
+    local http_opt = {
+        url = url,
+        headers = {
+            ["Accept"] = "*/*",
+            ["Accept-Language"] = "sk;q=0.8,en-US,en;q=0.6,cs;q=0.4",
+            ["Accept-Charset"] = "UTF-8;q=0.8,*;q=0.7",
+        },
+        sink = ltn12.sink.table(tbody),
+        redirect = false,
+    }
+    if string_sub(url, 1, 5) ~= "https" then
+        _, c, h, s = http.request(http_opt)
+    else
+        _, c, h, s = https.request(https_opt)
+    end
+    -- make headers keys lowercase
+    if h ~= nil then
+        local h_tmp = {}
+        for k, v in pairs(h) do h_tmp[k:lower()] = v end
+        h = h_tmp
+    end
+    -- concat body parts
+    b = table_concat(tbody)
+    return {body = b, code = c, headers = h, status = s}
+end
+</code></pre>
+
+<p>However, this function can be rewritten much more nicely using the <a href="https://daurnimator.github.io/lua-http/#http.request"><code>http.request</code></a> module.</p>
+
+<pre><code>
+local http_req = require "http.request"
+local h1_reason_phrases = require "http.h1_reason_phrases"
+local function make_request(url, timeout)
+    local r = http_req.new_from_uri(url)
+    r.headers:upsert("useragent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36")
+    r.headers:upsert("accept", "*/*")
+    r.headers:upsert("accept-language", "sk;q=0.8,en-US,en;q=0.6,cs;q=0.4")
+    r.headers:upsert("accept-charset", "UTF-8;q=0.8,*;q=0.7")
+    r.follow_redirects = false
+    local headers, stream = r:go(timeout)
+    if headers == nil then
+        return nil, stream
+    end
+    local b, err = stream:get_body_as_string(timeout) -- XXX: use a deadline instead of a timeout?
+    stream:shutdown() -- shutdown ASAP to free resources
+    if b == nil then
+        return nil, err
+    end
+    local c = headers:get(":status")
+    local s = h1_reason_phrases[c] -- look up reason phrase for code
+    c = tonumber(c, 10) or c -- the code might not be numeric
+    -- convert from headers object to unordered table of key/value pairs
+    local h = {}
+    for name in headers:each() do
+        if name ~= ":status" and h[name] == nil then
+            h[name] = headers:get_comma_separated(name)
+        end
+    end
+    return {body = b, code = c, headers = h, status = s}
+end
+</code></pre>
+
+<p>If the user has the flexibility to change the API of their <code>make_request</code> function, they may wish to use the lua-http <code>http.headers</code> object directly instead of transforming it to <code>code</code> + table of header name =&gt; value pairs.</p>

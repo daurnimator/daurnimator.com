@@ -1,0 +1,73 @@
+---
+layout: post
+title: HTML generation with lua
+date: '2010-05-17T00:46:00+10:00'
+tags:
+- lua
+- html
+- programming
+tumblr_url: http://daurnimator.com/post/603878464/html-generation-with-lua
+---
+<p>In my adventures on the web; I discovered an aid for writing HTML called <a href="http://code.google.com/p/zen-coding/">zen-coding</a>. Playing a bit with it, I found it lacking in some departments, and began to think that macros aren&rsquo;t whats needed, but complete generation.</p>
+
+
+
+<p>I remembered seeing an example of some html generating lua code a while back, and for a bit of fun decided to do my own take on it&hellip;</p>
+
+
+
+<blockquote>
+<p>local function renderattributes ( attr )<br/>    local t , i = { } , 1<br/>    for k , v in pairs ( attr ) do<br/>        t [ i ] = &rsquo; &rsquo;<br/>        t [ i + 1 ] = k<br/>        t [ i + 2 ] = &rsquo;=&ldquo;&rsquo;<br/>        t [ i + 3 ] = v<br/>        t [ i + 4 ] = &rsquo;&rdquo;&rsquo;<br/>        i = i + 5<br/>    end<br/>    return table.concat ( t )<br/>end<br/><br/>local function tostringtable ( t )<br/>    local r = { }<br/>    for i , v in ipairs ( t ) do<br/>        r [ i ] = tostring ( v )<br/>    end<br/>    return r<br/>end<br/><br/>local elementmeta = {<br/>    __tostring = function ( t )<br/>        if #t == 0 then &ndash; Self closing tag<br/>            return &ldquo;&lt;&rdquo; .. t.tag .. renderattributes ( t.attr ) .. &ldquo;/&gt;&rdquo;<br/>        else<br/>            return &ldquo;&lt;&rdquo; .. t.tag .. renderattributes ( t.attr ) .. &ldquo;&gt;&rdquo; .. table.concat ( tostringtable ( t ) ) .. &ldquo;&lt;/&rdquo; .. t.tag .. &ldquo;&gt;&rdquo;<br/>        end<br/>    end ;<br/>}<br/><br/>local escapecodes = setmetatable (<br/>    {<br/>        [&ldquo;&lt;&rdquo;] = &ldquo;&amp;lt;&rdquo; ;<br/>        [&ldquo;&gt;&rdquo;] = &ldquo;&amp;gt;&rdquo; ;<br/>        [&ldquo;&amp;&rdquo;] = &ldquo;&amp;amp;&rdquo; ;<br/>        [&rsquo;&ldquo;&rsquo;] = &rdquo;&amp;quot;&ldquo; ;<br/>    } ,<br/>    { __index = function ( t , k ) return string.format ( &rdquo;&amp;#%03d;&ldquo; , string.byte ( k ) ) end }<br/>)<br/><br/>local function escapehtml ( str )<br/>    return ( str:gsub ( [=[[&lt;&gt;&amp;&rdquo;]]=] , escapecodes ) )<br/>end<br/><br/>local stringmeta = {<br/>    __tostring = function ( t )<br/>        return escapehtml ( table.concat ( t ) )<br/>    end<br/>}<br/><br/>local function construct ( tag , contents )<br/>    local attr = { }<br/>    local r = { tag = tag , attr = attr }<br/><br/>    for k , v in pairs ( contents ) do<br/>        if type ( k ) == &ldquo;string&rdquo; then &ndash; attribute<br/>            assert ( type ( v ) == &ldquo;string&rdquo; , &ldquo;Attributes must be strings&rdquo; )<br/>            attr [ k ] = v<br/>        elseif type ( k ) == &ldquo;number&rdquo; then &ndash; Contents<br/>            if type ( v ) == &ldquo;string&rdquo; then<br/>                r [ k ] = setmetatable ( { v } , stringmeta )<br/>            elseif type ( v ) == &ldquo;number&rdquo; then<br/>                r [ k ] = setmetatable ( { tostring ( v ) } , stringmeta )<br/>            else<br/>                r [ k ] = v<br/>            end<br/>        else<br/>            error ( &ldquo;Bad type&rdquo; )<br/>        end<br/>    end<br/><br/>    return setmetatable ( r , elementmeta )<br/>end<br/><br/>local CDATA = function ( p ) return setmetatable ( p , { __tostring = function ( t ) return &ldquo;&lt;![CDATA[&rdquo; .. table.concat ( tostringtable ( p ) ) .. &ldquo;]]&gt;&rdquo; end } ) end<br/>local javascriptblock = function ( p ) return construct ( &ldquo;script&rdquo; , { type=&ldquo;text/javascript&rdquo; ; &ldquo;//&rdquo; ; CDATA { &rsquo;\n&rsquo; ; p ; &rsquo;\n//&rsquo; } } ) end<br/>tags = setmetatable ( {<br/>        CDATA = CDATA ;<br/>        javascriptblock = javascriptblock ;<br/>    } ,<br/>    { __index = function ( t , k ) return function ( p ) return construct ( k , p ) end end }<br/>)</p>
+</blockquote>
+
+
+
+<p>To be used like so:</p>
+
+
+
+<blockquote>
+<p>setmetatable ( _G , { __index = tags } )<br/><br/>print ( html {<br/>        head {<br/>            title { &ldquo;Text&rdquo; } ;<br/>            javascriptblock [[alert(&ldquo;XHTML compatible!&rdquo; );]] ;<br/>        } ;<br/>        body {<br/>            div { id=&ldquo;main&rdquo; ;<br/>                img { src = &ldquo;blah.jpg&rdquo; };<br/>            }<br/>        }<br/>    } )</p>
+</blockquote>
+
+
+
+<p>Output:</p>
+
+
+
+<blockquote>
+<p>&lt;html&gt;&lt;head&gt;&lt;title&gt;Text&lt;/title&gt;&lt;script type=&ldquo;text/javascript&rdquo;&gt;//&lt;![CDATA[<br/>alert(&ldquo;XHTML compatible!&rdquo; );<br/>//]]&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&ldquo;main&rdquo;&gt;&lt;img src=&ldquo;blah.jpg&rdquo;/&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;</p>
+</blockquote>
+
+
+
+<p>The code is quite extensible, to create a new tag/block, all you need is a table with a __tostring metamethod.</p>
+
+
+
+<p>Contrary to first appearances, it doesn&rsquo;t just create a document from a table, but creates an internal structure of a document; which can then be generated on demand (via the recursive __tostring metamethods). This means that dynamic content can be used with the same structure:</p>
+
+
+
+<blockquote>
+<p>userloggedin = function () return true  end<br/>function loggedinonly ( p ) if userloggedin() then return setmetatable ( p , { __tostring = function ( t ) return table.concat ( tostringtable ( p ) ) end } ) else return &ldquo;&rdquo; end end<br/>print ( body {<br/>    loggedinonly {<br/>        div {<br/>            &ldquo;Logged in!&rdquo;<br/>        }<br/>    }<br/>} )</p>
+</blockquote>
+
+
+
+<p>Obviously, to facilitate writing conditional code easier, some simple helper functions can be created:</p>
+
+
+
+<blockquote>
+<p>setpassthrough = function ( t ) return setmetatable ( t , { __tostring = function ( o ) return table.concat ( tostringtable ( o ) ) end } ) end<br/><br/>function ifcond ( cond , t , f )<br/>    if cond then<br/>        return setpassthrough ( t )<br/>    else<br/>        if f then<br/>            return setpassthrough ( f )<br/>        else<br/>            return &ldquo;&rdquo;<br/>        end<br/>    end<br/>end</p>
+</blockquote>
+
+
+
+<p>Maybe when I need to write some html I can put this into practice!</p>
+
+
+
+<p>If you find this useful, please give me a yell!</p>

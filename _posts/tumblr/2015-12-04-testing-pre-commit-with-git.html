@@ -1,0 +1,38 @@
+---
+layout: post
+title: Testing pre-commit with git
+date: '2015-12-04T21:24:27+11:00'
+tags:
+- git
+- lua
+- testing
+tumblr_url: http://daurnimator.com/post/134519891749/testing-pre-commit-with-git
+---
+<p>It&rsquo;s great to run tests on your code <em>before</em> you commit it. It&rsquo;s even better to make that happen automatically!</p>
+
+<p>git lets you run a script before a commit succeeds by creating what is known as a &ldquo;pre-commit&rdquo; hook; it&rsquo;s simply an executable located at <code>.git/hooks/pre-commit</code>.</p>
+
+<p>However, there are a few gotchas: by default, git will just run it against your current (possibly dirty) checkout. To make sure you&rsquo;re actually testing the code you&rsquo;re about to commit, we can stash your other changes while the tests run.</p>
+
+<p>This brings up another issue: that popping a git stash that includes an index will often result in conflicts; we can solve this by using <code>git reset --hard</code> before we pop from the stash.</p>
+
+<p>One last thing: we want to recover to the original directory state no matter what happens (e.g. maybe our test suite itself fails); so we use a bash <code>trap</code> to ensure that our stash popping happens no-matter the exit path.</p>
+
+<p>With that all said, here is what I use as a pre-commit hook for my lua projects:</p>
+
+<pre><code>#!/bin/bash
+set -eufo pipefail
+
+if [ -n "$(git status -z)" ]; then
+    git stash -q --keep-index --include-untracked
+    trap "git reset -q --hard &amp;&amp; git stash pop -q --index" EXIT
+fi
+
+echo "## Running luacheck"
+luacheck .
+echo
+
+echo "## Running tests with busted"
+busted
+echo
+</code></pre>
