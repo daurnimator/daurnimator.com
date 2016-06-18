@@ -7,7 +7,6 @@ paginate: 5
 gems:
   - jekyll-feed
   - jekyll-paginate
-  - jekyll-timeago
 
 feed:
   path: rss

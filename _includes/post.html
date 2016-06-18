@@ -22,7 +22,7 @@
                 <ul>
                     <li>
                         <a href="{{ site.url | append: post.url | escape }}" title="{{ post.date | date_to_rfc822 }}">
-                        {{ post.date | timeago }}
+                        {{ post.date | escape }}
                         </a>
                     </li>
                 </ul>
