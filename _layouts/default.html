@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ site.name | escape }}{% if page.title %} &mdash; {{ page.title | escape }}{% endif %}</title>
-    <meta name="description" content="{{ site.description | escape }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-site-verification" content="taZEkt6v1ROXcvbaXrr3lmynLkclyhvQhWwJp2U58u0" />
     {% feed_meta %}
+    {% seo title=false %}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="//static.tumblr.com/7esz91z/uVAn5wo0l/main.min.css" rel="stylesheet">
     <style>

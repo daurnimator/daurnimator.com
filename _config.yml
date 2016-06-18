@@ -9,6 +9,7 @@ paginate: 5
 gems:
   - jekyll-feed
   - jekyll-paginate
+  - jekyll-seo-tag
 
 feed:
   path: rss
