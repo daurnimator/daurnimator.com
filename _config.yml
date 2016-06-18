@@ -1,1 +1,7 @@
 name: Daurnimator's Hovel
+
+gems:
+  - jekyll-feed
+
+feed:
+  path: rss
