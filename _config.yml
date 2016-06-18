@@ -1,7 +1,13 @@
 name: Daurnimator's Hovel
+description: A place for thoughts, rants and progress reports
+url: https://daurnimator.github.io
+
+paginate: 5
 
 gems:
   - jekyll-feed
+  - jekyll-paginate
+  - jekyll-timeago
 
 feed:
   path: rss

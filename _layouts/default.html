@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ site.name | escape }}{% if page.title %} &mdash; {{ page.title | escape }}{% endif %}</title>
+    <meta name="description" content="{{ site.description | escape }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="taZEkt6v1ROXcvbaXrr3lmynLkclyhvQhWwJp2U58u0" />
+    {% feed_meta %}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href="http://static.tumblr.com/7esz91z/uVAn5wo0l/main.min.css" rel="stylesheet">
+    <style>
+    html {
+        color: #333;
+        font: 100%/1.5 Avenir, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+    }
+    a {
+        color: #999;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    a > h1,
+    a > h2,
+    a > h3 {
+        color: #333;
+    }
+    .btn {
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
+        background: #333;
+        border: 0;
+        border-radius: 0;
+        color: #FFF;
+        cursor: pointer;
+        font: inherit;
+        -webkit-font-smoothing: inherit;
+        margin: 0;
+        outline: 0;
+        padding: .5rem 1.5rem;
+    }
+    .site-header {
+        background-color: #FFF;
+        color: #333;
+        display: table;
+        height: {% if page.layout == 'default' %}100{% else %}50{% endif %}%;
+        text-align: center;
+        width: 100%;
+    }
+    .site-header a,
+    .site-header h1,
+    .nav-bar h1 {
+        color: #333;
+    }
+    .nav-bar {
+        background: transparent;
+        height: 48px;
+        position: fixed;
+        top: 0; left: 0;
+        text-align: center;
+        -webkit-transition: background 0.3s;
+           -moz-transition: background 0.3s;
+                transition: background 0.3s;
+        width: 100%;
+        z-index: 9999;
+    }
+    .nav-bar button {
+        color: #333;
+    }
+    .nav-bar.active {
+        background: #FFF;
+        border-bottom: 1px solid #EEE;
+    }
+    .posts {
+        background: #FFF;
+        padding: 1.5rem;
+    }
+    .site-footer {
+        background: #FFF;
+        text-align: center;
+        padding-bottom: 3rem;
+    }
+    img.avatar {
+        display: inline;
+        margin: 0 .5rem 0 0;
+        width: auto;
+    }
+    .logo {
+        display: block;
+        margin: 0 auto 1rem auto;
+    }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="/">
+                <h1>{{ site.name | escape }}</h1>
+            </a>
+            <p>{{ site.description | escape }}</p>
+            <ul class="social">
+                <li>
+                    <a href="/rss">
+                        <i class="fa fa-rss"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="mailto:quae@daurnimator.com">
+                        <i class="fa fa-envelope-o"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://twitter.com/daurnimator">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://github.com/daurnimator">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.youtube.com/user/daurnimator">
+                        <i class="fa fa-youtube"></i>
+                    </a>
+                </li>
+            </ul>
+            {% if page.layout == 'tag' %}
+            <div class="results">
+                Showing posts tagged {{ page.tag | escape }}
+            </div>
+            {% endif %}
+        </div><!-- /.site-header-inner -->
+    </header>
+    <div class="nav-bar">
+        <div class="nav-bar-inner">
+            <a href="/">
+                <h1>{{ site.name | escape }}</h1>
+            </a>
+        </div>
+    </div>
+    <section class="posts">
+        <div class="posts-inner">
+            {{ content }}
+        </div><!-- /.posts-inner -->
+    </section><!-- /.posts -->
+    <footer class="site-footer">
+        {% if paginator.previous_page_path %}
+        <a href="{{ paginator.previous_page_path | escape }}" class="previous">
+            <i class="fa fa-angle-left"></i>
+        </a>
+        {% endif %}
+        {% if paginator.next_page_path %}
+        <a href="{{ paginator.next_page_path | escape }}" class="next">
+            <i class="fa fa-angle-right"></i>
+        </a>
+        {% endif %}
+
+        {% if page.previous %}
+            <a href="{{ page.previous.url | escape }}">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        {% endif %}
+        {% if page.next %}
+            <a href="{{ page.next.url | escape }}">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        {% endif %}
+    </footer>
+    <script>
+        window.onscroll = function() {
+            var navBar = document.querySelector('.nav-bar');
+            if (window.scrollY >= document.querySelector('.site-header').getBoundingClientRect().height -48)
+                navBar.classList.add('active');
+            else
+                navBar.classList.remove('active');
+        };
+        </script>
+    <script>{% include ga.js %}</script>
+</html>
