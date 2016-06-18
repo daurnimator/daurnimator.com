@@ -1,6 +1,8 @@
 name: Daurnimator's Hovel
 description: A place for thoughts, rants and progress reports
 url: https://daurnimator.github.io
+twitter:
+  username: daurnimator
 
 paginate: 5
 

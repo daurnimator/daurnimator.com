@@ -114,11 +114,13 @@
                         <i class="fa fa-envelope-o"></i>
                     </a>
                 </li>
+                {% if site.twitter.username %}
                 <li>
-                    <a href="https://twitter.com/daurnimator">
+                    <a href="https://twitter.com/{{ site.twitter.username | url_encode | escape }}">
                         <i class="fa fa-twitter"></i>
                     </a>
                 </li>
+                {% endif %}
                 <li>
                     <a href="https://github.com/daurnimator">
                         <i class="fa fa-github"></i>
